@@ -1,0 +1,49 @@
+id;aliases;etage
+C3-01;salle C3-01|c3 01|c trois zero un|salle c trois zero un;3
+C3-02;salle C3-02|c3 02|c trois zero deux|salle c trois zero deux;3
+C3-03;salle C3-03|c3 03|c trois zero trois|salle c trois zero trois;3
+C3-04;salle C3-04|c3 04|c trois zero quatre|salle c trois zero quatre;3
+C3-05;salle C3-05|c3 05|c trois zero cinq|salle c trois zero cinq;3
+C2-01;salle C2-01|c2 01|c deux zero un|salle c deux zero un;2
+C2-02;salle C2-02|c2 02|c deux zero deux|salle c deux zero deux;2
+C2-03;salle C2-03|c2 03|c deux zero trois|salle c deux zero trois;2
+C2-06;salle C2-06|c2 06|c deux zero six|salle c deux zero six;2
+C2-07;salle C2-07|c2 07|c deux zero sept|salle c deux zero sept;2
+D2-03;salle D2-03|d2 03|d deux zero trois|salle d deux zero trois;2
+D2-04;salle D2-04|d2 04|d deux zero quatre|salle d deux zero quatre;2
+D2-05;salle D2-05|d2 05|d deux zero cinq|salle d deux zero cinq;2
+D2-06;salle D2-06|d2 06|d deux zero six|salle d deux zero six;2
+D2-07;salle D2-07|d2 07|d deux zero sept|salle d deux zero sept;2
+D2-08;salle D2-08|d2 08|d deux zero huit|salle d deux zero huit;2
+B1-12;salle B1-12|b1 12|b un douze|salle b un douze;1
+B1-13;salle B1-13|b1 13|b un treize|salle b un treize;1
+B1-15;salle B1-15|b1 15|b un quinze|salle b un quinze;1
+B1-17;salle B1-17|b1 17|b un dix sept|salle b un dix sept;1
+C1-01;salle C1-01|c1 01|c un zero un|salle c un zero un;1
+ELECTRONIQUE;salle electronique|electronique|atelier electronique|labo electronique|electro|electroniciens|secteur electronique;1
+INFORMATIQUE;salle informatique|informatique|atelier informatique|labo informatique|info|informaticiens|secteur informatique;1
+MICROTECHNIQUE;salle microtechnique|microtechnique|atelier microtechnique|labo microtechnique|micro|microtechnicien|secteur microtechnique;1
+NEWTEC;newtec|new tech|niou tek|nioutek|nu tek|nutec|salle newtec|espace newtec;1
+BUREAU TECHNIQUE;bureau technique;1
+METROLOGIE;metrologie;1
+BUREAU ENSEIGNANT;bureau enseignant|enseignant| bureau des enseignants|salle enseignants;1
+SALLE DES MAITRES;salle des maitres|maitres|profs|salle des profs;1
+D1-04;salle D1-04|d1 04|d un zero quatre|salle d un zero quatre;1
+MPT;m p t|salle m p t|salle etudiants m p t|mpt| salle m p t;1
+EST PROCESSUS;e s t processus|e s t|salle e s t processus|processus|etudiants e s t processus;1
+RESTAURANT SCOLAIRE;restaurant scolaire|restaurant|cantine|cantine scolaire;4
+SALLE DE GYMNASTIQUE;salle de gymnastique|gymnase|gym|salle de sport|sport;4
+CONCIERGERIE;conciergerie|concierge|salle du concierge;0
+B0-08;salle B0-08|b0 0 8|b zero zero huit|salle zero zero huit;0
+B0-14;salle B0-14|b0 14|b zero quatorze|salle zero quatorze;0
+CHIMIE;chimie|salle de chimie|labo de chimie|laboratoirs de chimie|chimiste|laborantins|salle des laborantains|labo laborantains|secteur chimie;0
+HORLOGERIE;salle horlogerie|horloger|horlogerie|salle horlogers|atelier horlogerie|secteur horlogerie;0
+AUTOMATION;automation|salle automation|automatique|automaticien|salle automaticien|atelier automatique|secteur automatique;0
+EST SYSTEME INDUSTRIEL;e s t systeme industriel|systeme industriel|systeme indu|etudiants systeme industriel;0
+EST INFORMATIQUE;e s t informatique|e s t informaticien;0
+AUTOMOBILE;automobile|secteur automobile;0
+SALLE EUROPE;salle europe|europe|salle de reunion;0
+DIRECTION;direction|bureau du directeur|directeur|bureau de la direction;0
+SECRETARIAT;secretariat|bureau du secretariat|secretaire;0
+REFECTOIRE;refectoire|salle du refectoire|salle a manger |micro-ondes;0
+INFIRMERIE;infirmerie|infirmier|urgence|blessure|blesser|malade|maladie|infirmiere;1
