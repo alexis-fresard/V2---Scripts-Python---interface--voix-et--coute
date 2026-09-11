@@ -26,26 +26,33 @@ Si la démo C fonctionne mais pas ce script Python, le souci est côté config
 Python (options ci-dessous) ou côté environnement (venv / droits root).
 """
 
+import sys
 from rgbmatrix import RGBMatrix, RGBMatrixOptions, graphics
 
 # ---------------------------------------------------------------------------
-# Configuration — identique à la commande de démo C qui a déjà fonctionné :
-#   --led-no-hardware-pulse --led-gpio-mapping=regular --led-slowdown-gpio=4
+# Configuration — identique à la commande de démo C qui a déjà fonctionné,
+# avec gpio_slowdown et pwm_bits réglables en argument de ligne de commande :
+#   sudo ...python3 test_materiel_led.py [gpio_slowdown] [pwm_bits]
+#   ex: sudo ...python3 test_materiel_led.py 8 1
 # ---------------------------------------------------------------------------
+gpio_slowdown_arg = int(sys.argv[1]) if len(sys.argv) > 1 else 4
+pwm_bits_arg = int(sys.argv[2]) if len(sys.argv) > 2 else 11
+
 options = RGBMatrixOptions()
 options.rows = 32
 options.cols = 32
 options.chain_length = 2          # 2 panneaux chaînés -> adapter si autre montage
 options.parallel = 1
 options.hardware_mapping = "regular"
-options.gpio_slowdown = 4
+options.gpio_slowdown = gpio_slowdown_arg
 options.disable_hardware_pulsing = True
+options.pwm_bits = pwm_bits_arg
 
 print("Configuration utilisée :")
 print(f"  rows={options.rows} cols={options.cols} chain_length={options.chain_length} "
       f"parallel={options.parallel}")
 print(f"  hardware_mapping={options.hardware_mapping} gpio_slowdown={options.gpio_slowdown} "
-      f"disable_hardware_pulsing={options.disable_hardware_pulsing}")
+      f"disable_hardware_pulsing={options.disable_hardware_pulsing} pwm_bits={options.pwm_bits}")
 print(f"  -> canvas total : {options.cols * options.chain_length}x{options.rows * options.parallel}\n")
 
 matrix = RGBMatrix(options=options)
