@@ -106,7 +106,7 @@ def rafraichir_une_fois(framebuffer):
         set_adresse(adresse)
         pulse(STROBE)
         GPIO.output(OE, 0)  # active la sortie
-        time.sleep(0.0003)  # temps d'affichage de la paire de lignes
+        #time.sleep(0.0003)  # temps d'affichage de la paire de lignes
 
 
 def attendre_entree_en_arriere_plan(message):
