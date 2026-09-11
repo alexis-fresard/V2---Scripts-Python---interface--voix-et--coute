@@ -18,17 +18,21 @@ Lancement :
 """
 
 import threading
-
+import led
 import core
 import voix
 from interface_tactile import BorneApp
+
 
 
 def main():
     destinations = core.charger_destinations()
     print(f"{len(destinations)} destination(s) chargée(s) depuis "
           f"'{core.DESTINATIONS_CSV_PATH}'.")
-
+    
+    destinations = core.charger_destinations()
+    led.initialiser()
+    core.ajouter_abonne(led.on_destination_reconnue)
     arret_event = threading.Event()
 
     def lancer_ecoute():

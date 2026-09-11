@@ -96,6 +96,7 @@ def charger_destinations(chemin_csv: str = None):
 
             a_colonne_etage = "etage" in lecteur.fieldnames
             a_colonne_couleur = "couleur" in lecteur.fieldnames
+            a_colonne_led = "ligne" in lecteur.fieldnames and "colonne" in lecteur.fieldnames
 
             for ligne in lecteur:
                 identifiant = ligne["id"].strip()
@@ -120,11 +121,26 @@ def charger_destinations(chemin_csv: str = None):
                     if couleur_brute:
                         couleur = couleur_brute
 
+                ligne_led = None
+                colonne_led = None
+                if a_colonne_led:
+                    ligne_led_brute = (ligne.get("ligne") or "").strip()
+                    colonne_led_brute = (ligne.get("colonne") or "").strip()
+                    if ligne_led_brute and colonne_led_brute:
+                        try:
+                            ligne_led = int(ligne_led_brute)
+                            colonne_led = int(colonne_led_brute)
+                        except ValueError:
+                            print(f"Attention : coordonnées LED invalides pour "
+                                  f"la destination '{identifiant}', ignorées.")
+
                 destinations.append({
                     "id": identifiant,
                     "aliases": aliases,
                     "etage": etage,
                     "couleur": couleur,
+                    "ligne_led": ligne_led,
+                    "colonne_led": colonne_led,
                 })
 
     except FileNotFoundError:
