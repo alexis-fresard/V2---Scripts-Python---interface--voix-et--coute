@@ -705,7 +705,7 @@ class BorneApp(App):
         Window.bind(on_touch_down=self._signaler_activite)
         # Affichage de l'écran de veille avec F1
         Window.bind(on_key_down=self._sur_touche_clavier)
-        #Window.fullscreen = True # Lance l'application en fullscreen par défaut
+        Window.fullscreen = True # Lance l'application en fullscreen par défaut
         Clock.schedule_interval(self._verifier_veille, 5)
         Clock.schedule_interval(self._maj_horloge, 1)
         self._maj_horloge(0)
