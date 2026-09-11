@@ -1,5 +1,5 @@
-id;aliases;etage
-C3-01;salle C3-01|c3 01|c trois zero un|salle c trois zero un;3
+id;aliases;etage;ligne;colonne
+C3-01;salle C3-01|c3 01|c trois zero un|salle c trois zero un;3;30;40
 C3-02;salle C3-02|c3 02|c trois zero deux|salle c trois zero deux;3
 C3-03;salle C3-03|c3 03|c trois zero trois|salle c trois zero trois;3
 C3-04;salle C3-04|c3 04|c trois zero quatre|salle c trois zero quatre;3
