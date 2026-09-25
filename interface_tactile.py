@@ -81,6 +81,9 @@ import threading
 import time
 from datetime import datetime
 
+from kivy.config import Config
+Config.set('kivy', 'keyboard_mode', 'dock')  # clavier virtuel Kivy, ancré en bas 
+
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
@@ -142,7 +145,7 @@ FICHIERS_ICONES = {
     "sport": "sport.png",
     "sante": "heal.png",
     "sanitaires": "wc.png",
-    #"conciergerie": "cleaning.png",
+    "conciergerie": "cleaning.png",
 }
 
 
@@ -204,7 +207,7 @@ def deduire_type_icone(dest) -> str:
         (("sport","gym"), "sport"),
         (("infirmerie", "sante", "medical", "secours"), "sante"),
         (("secretariat", "direction", "bureau", "administration"), "bureau"),
-        #(("concièrge"), "conciergerie"),
+        (("concierge",), "conciergerie"),
     )
     for mots_cles, type_icone in regles:
         if any(mot in texte for mot in mots_cles):
@@ -703,9 +706,9 @@ class BorneApp(App):
         # de veille à zéro (voir _signaler_activite). L'appui sur le micro
         # et une reconnaissance vocale le remettent aussi à zéro ailleurs.
         Window.bind(on_touch_down=self._signaler_activite)
-        # Affichage de l'écran de veille avec F1
+        # Affichage de l'écran de veille avec F2
         Window.bind(on_key_down=self._sur_touche_clavier)
-        Window.fullscreen = True # Lance l'application en fullscreen par défaut
+        #Window.fullscreen = True # Lance l'application en fullscreen par défaut
         Clock.schedule_interval(self._verifier_veille, 5)
         Clock.schedule_interval(self._maj_horloge, 1)
         self._maj_horloge(0)
@@ -723,7 +726,7 @@ class BorneApp(App):
     
 
     # -- Horloge & écran de veille ----------------------------------------------
-
+    
     def _maj_horloge(self, dt):
         maintenant = datetime.now()
         self.label_horloge.text = maintenant.strftime("%H:%M")
@@ -848,7 +851,7 @@ class BorneApp(App):
         l'écran tactile se fige pendant toute l'écoute)."""
         try:
             voix.ecouter(destinations=self.destinations, arret_event=evenement)
-        except BaseException as exc:
+        except Exception as exc:
             print(f"[micro] Erreur pendant l'écoute : {exc}")
             Clock.schedule_once(
                 lambda dt: self._arreter_ecoute(

@@ -1,0 +1,10 @@
+1. Changer la génération de voix - OK (Piper)
+2. Modifier le CSV - ?
+3. Allumage auto au démarrage
+4. Micro USB sur le Rasberry
+5. Logo pour la conciergerie - OK
+6. Dernières config sur le PI (perf et sécurité)
+7. Verifier avec tests la détection vocal (chez moi)
+8. Clavier virtuel automatique - OK
+
+Ensuite GG c'est fini

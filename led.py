@@ -44,12 +44,25 @@ séparé (voir `threading.Thread` plus bas).
 
 Configuration matérielle : carte rouge en direct sur GPIO, mapping
 "regular", 2 panneaux chaînés 64x32, Pi 4.
+
+GARDE-FOU WINDOWS / DEV : `rgbmatrix` pilote le GPIO physique du
+Raspberry Pi et ne peut donc pas s'installer/fonctionner sur Windows ou
+tout autre système sans ce matériel. L'import est protégé ci-dessous :
+sur une machine sans `rgbmatrix`, ce module se charge quand même (pas de
+crash à l'import dans main.py), mais toutes les fonctions LED deviennent
+des no-op silencieux, avec un seul avertissement affiché à l'initialisation.
+Permet de développer/tester la voix, le matching et l'interface tactile
+sur Windows sans toucher au reste du code.
 """
 
 import threading
 import time
 
-from rgbmatrix import RGBMatrix, RGBMatrixOptions
+try:
+    from rgbmatrix import RGBMatrix, RGBMatrixOptions
+    LED_DISPONIBLE = True
+except ImportError:
+    LED_DISPONIBLE = False
 
 LARGEUR_CANVAS = 64
 HAUTEUR_CANVAS = 32
@@ -83,8 +96,19 @@ def _creer_options():
 def initialiser():
     """À appeler UNE SEULE FOIS au démarrage (dans main.py), avant tout
     abonnement. Créer plusieurs fois un RGBMatrix ferait planter ou
-    entrerait en conflit avec le GPIO déjà réservé."""
+    entrerait en conflit avec le GPIO déjà réservé.
+
+    Sur une machine sans `rgbmatrix` (ex. Windows), affiche un simple
+    avertissement et ne fait rien d'autre : les LED restent désactivées
+    pour toute la session, sans bloquer le reste de l'application."""
     global _matrix, _canvas
+
+    if not LED_DISPONIBLE:
+        print("[led] Bibliothèque 'rgbmatrix' indisponible sur ce système "
+              "(normal hors Raspberry Pi) — chemin LED désactivé pour "
+              "cette session.")
+        return
+
     if _matrix is not None:
         return  # déjà initialisé, on ne recrée pas
     _matrix = RGBMatrix(options=_creer_options())
@@ -94,6 +118,8 @@ def initialiser():
 def arreter():
     """À appeler à la fermeture propre de l'application pour éteindre
     proprement les panneaux."""
+    if not LED_DISPONIBLE:
+        return
     if _matrix is not None:
         _matrix.Clear()
 
@@ -143,7 +169,18 @@ def _dessiner_chemin(points):
 
 def on_destination_reconnue(destination_id, dest, source):
     """Signature attendue par core.ajouter_abonne : appelée automatiquement
-    à chaque destination reconnue, voix ou tactile confondus."""
+    à chaque destination reconnue, voix ou tactile confondus.
+
+    Sur une machine sans LED (Windows), se contente d'un message de
+    debug indiquant quel chemin aurait été affiché, sans rien dessiner."""
+    if not LED_DISPONIBLE:
+        if dest is not None and dest.get("ligne_led") is not None \
+                and dest.get("colonne_led") is not None:
+            arrivee = (dest["colonne_led"], dest["ligne_led"])
+            print(f"[led] (simulation, pas de matériel) Chemin vers "
+                  f"{destination_id} : {DEPART} -> {arrivee}")
+        return
+
     if _matrix is None:
         print("[led] initialiser() n'a pas été appelé, chemin LED ignoré.")
         return

@@ -24,7 +24,6 @@ import voix
 from interface_tactile import BorneApp
 
 
-
 def main():
     destinations = core.charger_destinations()
     print(f"{len(destinations)} destination(s) chargée(s) depuis "

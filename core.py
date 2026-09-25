@@ -31,7 +31,9 @@ reconnue, quelle que soit la source (voix ou tactile) :
 
 import csv
 import json
+import os
 import sys
+import threading
 import unicodedata
 from collections import Counter
 
@@ -45,6 +47,17 @@ SAMPLE_RATE = 16000                       # requis par Vosk
 DESTINATIONS_CSV_PATH = "Destinations.csv"
 
 VOIX_ACTIVEE = True   # passe à False pour désactiver complètement la voix
+
+# Voix principale : Piper (synthèse neuronale hors-ligne). Même modèle .onnx
+# sur Windows et sur le Raspberry Pi -> voix identique sur les deux systèmes.
+# Téléchargement du modèle (une seule fois, fichiers .onnx + .onnx.json) :
+#   python -m piper.download_voices fr_FR-siwis-medium --download-dir voix_piper
+PIPER_MODELE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                 "voix_piper", "fr_FR-siwis-medium.onnx")
+PIPER_LENTEUR = 1.1   # >1 = plus lent (plus compréhensible), <1 = plus rapide
+PIPER_VOLUME = 1.0
+
+# Repli si Piper ou le modèle est absent : pyttsx3 (SAPI5 / espeak-ng).
 VOIX_VITESSE = 150    # mots/minute (pyttsx3), ajuster selon préférence
 VOIX_LANGUE_PRIORITAIRE = "fr"  # pyttsx3 cherchera une voix contenant "fr"
 
@@ -242,8 +255,79 @@ def trouver_destination(destinations, texte_reconnu: str, seuil_ratio: float = 0
 
 
 # ---------------------------------------------------------------------------
-# SYNTHÈSE VOCALE (hors-ligne, via pyttsx3 / espeak-ng ou SAPI5 sur Windows)
+# SYNTHÈSE VOCALE (hors-ligne : Piper en priorité, pyttsx3 en repli)
 # ---------------------------------------------------------------------------
+
+_piper_voix = None
+_piper_indisponible = False
+_verrou_parole = threading.Lock()  # évite que deux phrases se chevauchent
+
+
+def _dossier_espeak_piper():
+    """Sous Windows, espeak-ng (utilisé par Piper pour la phonétisation) ne
+    sait pas ouvrir un chemin contenant des accents (ex. '...voix et
+    écoute\\.venv\\...'). Dans ce cas on copie une fois ses données dans un
+    dossier temporaire au chemin ASCII. Sur le Raspberry Pi (Linux), le
+    chemin d'origine fonctionne tel quel."""
+    import shutil
+    import tempfile
+    from piper.phonemize_espeak import ESPEAK_DATA_DIR
+
+    origine = str(ESPEAK_DATA_DIR)
+    if sys.platform != "win32" or origine.isascii():
+        return origine
+    copie = os.path.join(tempfile.gettempdir(), "piper-espeak-ng-data")
+    if not copie.isascii():
+        copie = os.path.join(os.environ.get("SystemDrive", "C:") + os.sep,
+                             "piper-espeak-ng-data")
+    if not os.path.isfile(os.path.join(copie, "phontab")):
+        shutil.copytree(origine, copie, dirs_exist_ok=True)
+    return copie
+
+
+def _charger_piper():
+    """Charge le modèle Piper une seule fois (quelques secondes sur le Pi).
+    Retourne None si Piper ou le modèle n'est pas disponible."""
+    global _piper_voix, _piper_indisponible
+    if _piper_voix is not None or _piper_indisponible:
+        return _piper_voix
+    try:
+        from piper import PiperVoice
+        import sounddevice  # noqa: F401  (lecture audio)
+    except ImportError as e:
+        print(f"[voix] Piper indisponible ({e}), repli sur pyttsx3.")
+        _piper_indisponible = True
+        return None
+    if not os.path.isfile(PIPER_MODELE_PATH):
+        print(f"[voix] Modèle Piper introuvable : '{PIPER_MODELE_PATH}', "
+              f"repli sur pyttsx3.")
+        _piper_indisponible = True
+        return None
+    try:
+        _piper_voix = PiperVoice.load(PIPER_MODELE_PATH,
+                                      espeak_data_dir=_dossier_espeak_piper())
+    except Exception as e:
+        print(f"[voix] Impossible de charger le modèle Piper : {e}")
+        _piper_indisponible = True
+    return _piper_voix
+
+
+def _parler_piper(voix_piper, texte: str):
+    import numpy as np
+    import sounddevice as sd
+    from piper import SynthesisConfig
+
+    config = SynthesisConfig(length_scale=PIPER_LENTEUR, volume=PIPER_VOLUME)
+    morceaux = []
+    sample_rate = voix_piper.config.sample_rate
+    for morceau in voix_piper.synthesize(texte, syn_config=config):
+        morceaux.append(morceau.audio_int16_array)
+        sample_rate = morceau.sample_rate
+    if not morceaux:
+        return
+    sd.play(np.concatenate(morceaux), samplerate=sample_rate)
+    sd.wait()
+
 
 def _creer_moteur_voix():
     """Recrée un moteur pyttsx3 à chaque phrase (contourne un bug connu
@@ -277,6 +361,18 @@ def _creer_moteur_voix():
 def parler(texte: str):
     if not VOIX_ACTIVEE:
         return
+    with _verrou_parole:
+        voix_piper = _charger_piper()
+        if voix_piper is not None:
+            try:
+                _parler_piper(voix_piper, texte)
+                return
+            except Exception as e:
+                print(f"[voix] Erreur Piper ({e}), repli sur pyttsx3.")
+        _parler_pyttsx3(texte)
+
+
+def _parler_pyttsx3(texte: str):
     moteur = _creer_moteur_voix()
     if moteur is None:
         return
@@ -298,7 +394,7 @@ def texte_etage(etage) -> str:
     if etage == 0:
         return "au rez-de-chaussée"
     if etage == 1:
-        return "au première étage"
+        return "au premier étage"
     if etage == 4:
         return "dans le bâtiment A"
     return f"au {etage}ème étage"
